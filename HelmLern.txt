@@ -1,0 +1,20 @@
+az group create --name TezResourceGroup --location eastus
+az acr create --resource-group TezResourceGroup --name TezHelmACR --sku Basic
+
+"loginServer": "tezhelmacr.azurecr.io",
+
+az acr login --name TezHelmACR
+
+
+Determine the ACR server name based on ResourceGroup
+az acr list --resource-group TezResourceGroup --query "[].{acrLoginServer:loginServer}" --output table
+Use the server name during retagging
+
+Retagging existing image for ACR
+docker tag tezzzzz/todo-rest-api-h2:1.0.0.RELEASE tezhelmacr.azurecr.io/todo-rest-api-h2:1.0.0.RELEASE
+
+docker push tezhelmacr.azurecr.io/todo-rest-api-h2:1.0.0.RELEASE
+
+
+
+az aks create -g MyResourceGroup -n TezAKS --location eastus  --attach-acr TezHelmACR --generate-ssh-keys
